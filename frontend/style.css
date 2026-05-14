@@ -1,0 +1,231 @@
+:root {
+    --bg-color: #0f1117;
+    --card-bg: #1a1d27;
+    --input-bg: #12151f;
+    --border-color: #2a2d3e;
+    --text-primary: #ffffff;
+    --text-secondary: #8b8fa8;
+    --accent: #6c63ff;
+
+    --ceo-color: #6c63ff;
+    --dev-color: #00d4aa;
+    --marketer-color: #ff6b6b;
+    --investor-color: #ffd93d;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    padding: 40px 20px;
+}
+
+#app {
+    max-width: 960px;
+    margin: 0 auto;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 40px;
+    padding: 40px 20px;
+}
+
+header h1 {
+    font-size: 2.8rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, #6c63ff, #00d4aa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+header p {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+}
+
+#idea-summary {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-left: 4px solid var(--accent);
+    border-radius: 10px;
+    padding: 14px 20px;
+    margin-bottom: 32px;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+#idea-summary span {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+#input-section {
+    margin-bottom: 48px;
+}
+
+#input-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+#input-card label {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+#input-card textarea {
+    background: var(--input-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-family: inherit;
+    padding: 14px;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+#input-card textarea:focus {
+    border-color: var(--accent);
+}
+
+#budget-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 6px;
+    border-radius: 4px;
+    background: var(--border-color);
+    outline: none;
+    cursor: pointer;
+}
+
+#budget-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+}
+
+#budget-display {
+    color: var(--accent);
+    font-weight: 700;
+}
+
+#simulate-btn {
+    background: linear-gradient(135deg, var(--accent), #00d4aa);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 14px 32px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+    margin-top: 8px;
+}
+
+#simulate-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+}
+
+#simulate-btn:active {
+    transform: translateY(0px);
+}
+
+#simulate-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+#results-section {
+    display: none;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+#results-section h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 24px;
+    color: var(--text-primary);
+}
+
+#cards-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 48px;
+}
+
+.agent-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 24px;
+    flex: 1 1 calc(50% - 10px);
+    min-width: 280px;
+    border-top: 4px solid var(--border-color);
+    transition: transform 0.2s;
+}
+
+.agent-card:hover {
+    transform: translateY(-4px);
+}
+
+#card-ceo { border-top-color: var(--ceo-color); }
+#card-developer { border-top-color: var(--dev-color); }
+#card-marketer { border-top-color: var(--marketer-color); }
+#card-investor { border-top-color: var(--investor-color); }
+
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.agent-icon { font-size: 1.5rem; }
+
+.agent-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.agent-response {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.7;
+}
+
+#chart-container {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 48px;
+}
