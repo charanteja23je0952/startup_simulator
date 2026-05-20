@@ -1,5 +1,5 @@
 from groq import Groq
-import os, concurrent.futures
+import os, concurrent.futures, json
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -33,17 +33,82 @@ def ask_agent(role, idea, budget):
     )
     return role, response.choices[0].message.content
 
+def run_analyst_agent(idea, budget, ceo, developer, marketer, investor):
+    prompt = f"""You are a startup analyst. Based on the following expert opinions, return ONLY a JSON object. No explanation, no markdown, no code blocks. Just raw JSON.
+
+Startup idea: {idea}
+Budget: ₹{budget}
+
+CEO: {ceo}
+Developer: {developer}
+Marketer: {marketer}
+Investor: {investor}
+
+Return exactly this structure:
+{{
+    "viability_score": <number 1-10>,
+    "market_size": "<string like '₹4,200 Cr'>",
+    "build_time": "<string like '4-6 months'>",
+    "risk_level": "<Low, Medium, or High>",
+    "budget_split": {{
+        "development": <percentage as integer>,
+        "marketing": <percentage as integer>,
+        "operations": <percentage as integer>,
+        "reserve": <percentage as integer>
+    }}
+}}"""
+
+    response = client.chat.completions.create(
+        model="llama-3.3-70b-versatile",
+        messages=[
+            {"role": "user", "content": prompt}
+        ]
+    )
+
+    raw = response.choices[0].message.content.strip()
+
+    if raw.startswith("```"):
+        raw = raw.split("```")[1]
+        if raw.startswith("json"):
+            raw = raw[4:]
+
+    return json.loads(raw)
+
 def run_all_agents(idea, budget):
     results = {}
     with concurrent.futures.ThreadPoolExecutor() as pool:
-        futures = [pool.submit(ask_agent, role, idea, budget)
-                   for role in AGENTS]
+        futures = [pool.submit(ask_agent, role, idea, budget) for role in AGENTS]
         for f in concurrent.futures.as_completed(futures):
             role, response = f.result()
             results[role] = response
+
+    try:
+        results["analyst"] = run_analyst_agent(
+            idea,
+            budget,
+            ceo=results["ceo"],
+            developer=results["developer"],
+            marketer=results["marketer"],
+            investor=results["investor"],
+        )
+    except Exception as e:
+        print(f"Analyst failed: {e}")
+        results["analyst"] = {
+            "viability_score": 5,
+            "market_size": "N/A",
+            "build_time": "N/A",
+            "risk_level": "Medium",
+            "budget_split": {
+                "development": 35,
+                "marketing": 25,
+                "operations": 20,
+                "reserve": 20
+            }
+        }
+
     return results
 
 if __name__ == "__main__":
-    out = run_all_agents("meal planning app for fridge contents", 10)
+    out = run_all_agents("meal planning app for fridge contents", 500000)
     for role, response in out.items():
         print(f"\n{role.upper()}:\n{response}")

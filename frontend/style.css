@@ -229,3 +229,46 @@ header p {
     padding: 32px;
     margin-bottom: 48px;
 }
+
+#metrics-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 48px;
+}
+
+.metric-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 24px;
+    flex: 1 1 calc(25% - 12px);
+    min-width: 160px;
+    text-align: center;
+}
+
+.metric-label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 12px;
+}
+
+.metric-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.metric-sub {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+#metric-risk-value.low    { color: var(--dev-color); }
+#metric-risk-value.medium { color: var(--investor-color); }
+#metric-risk-value.high   { color: var(--marketer-color); }
+
+#metric-viability-value { color: var(--accent); }

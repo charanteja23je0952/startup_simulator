@@ -51,14 +51,14 @@ function validate() {
 // ── Chart ────────────────────────────────────────────────────────
 let chartInstance = null;
 
-function drawChart(budget) {
+function drawChart(budget, budgetSplit) {
     const ctx = document.getElementById("budget-chart");
 
     const allocations = {
-        "CEO / Operations": Math.round(budget * 0.20),
-        "Development":      Math.round(budget * 0.35),
-        "Marketing":        Math.round(budget * 0.25),
-        "Investor Reserve": Math.round(budget * 0.20),
+        "Development":  Math.round(budget * budgetSplit.development / 100),
+        "Marketing":    Math.round(budget * budgetSplit.marketing / 100),
+        "Operations":   Math.round(budget * budgetSplit.operations / 100),
+        "Reserve":      Math.round(budget * budgetSplit.reserve / 100),
     };
 
     if (chartInstance) {
@@ -141,12 +141,20 @@ async function simulate() {
         responses.developer.innerText = data.agents.developer || "No response received.";
         responses.marketer.innerText  = data.agents.marketer  || "No response received.";
         responses.investor.innerText  = data.agents.investor  || "No response received.";
+ 
+        const analyst = data.agents.analyst;
+        document.getElementById("metric-viability-value").innerText = analyst.viability_score;
+        document.getElementById("metric-market-value").innerText    = analyst.market_size;
+        document.getElementById("metric-build-value").innerText     = analyst.build_time;
 
+        const riskEl = document.getElementById("metric-risk-value");
+        riskEl.innerText = analyst.risk_level;
+        riskEl.className = analyst.risk_level.toLowerCase();
         resultsSection.style.display = "block";
         setTimeout(function() {
             resultsSection.style.opacity = "1";
         }, 10);
-        drawChart(budget);
+        drawChart(budget, analyst.budget_split);
         resultsSection.scrollIntoView({ behavior: "smooth" });
 
     } catch (error) {
