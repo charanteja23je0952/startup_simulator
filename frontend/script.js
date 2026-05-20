@@ -119,7 +119,7 @@ async function simulate() {
     document.getElementById("idea-summary-text").innerText = idea;
 
     try {
-        const response = await fetch("http://localhost:5000/api/simulate", {
+        const response = await fetch("https://startup-simulator-backend.onrender.com/api/simulate", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
