@@ -137,16 +137,30 @@ async function simulate() {
         const data = await response.json();
         console.log("API response:", data);
 
-        responses.ceo.innerText       = data.agents.ceo       || "No response received.";
-        responses.developer.innerText = data.agents.developer || "No response received.";
-        responses.marketer.innerText  = data.agents.marketer  || "No response received.";
-        responses.investor.innerText  = data.agents.investor  || "No response received.";
+        responses.ceo.innerText       = data.round1.ceo       || "No response received.";
+        responses.developer.innerText = data.round1.developer || "No response received.";
+        responses.marketer.innerText  = data.round1.marketer  || "No response received.";
+        responses.investor.innerText  = data.round1.investor  || "No response received.";
  
-        const analyst = data.agents.analyst;
+        const analyst = data.analyst;
         document.getElementById("metric-viability-value").innerText = analyst.viability_score;
         document.getElementById("metric-market-value").innerText    = analyst.market_size;
         document.getElementById("metric-build-value").innerText     = analyst.build_time;
+         
+        const rounds = ["r2", "r3"];
+        const roundData = { r2: data.round2, r3: data.round3 };
+        const agents = ["ceo", "developer", "marketer", "investor"];
 
+        rounds.forEach(function(round) {
+            agents.forEach(function(agent) {
+                const bubble = document.getElementById(`debate-${round}-${agent}`);
+                if (bubble) {
+                    bubble.querySelector(".bubble-text").innerText =
+                        roundData[round][agent] || "No response.";
+                }
+            });
+        });
+         
         const riskEl = document.getElementById("metric-risk-value");
         riskEl.innerText = analyst.risk_level;
         riskEl.className = analyst.risk_level.toLowerCase();

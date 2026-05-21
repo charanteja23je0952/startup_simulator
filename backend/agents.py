@@ -8,20 +8,37 @@ client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 AGENTS = {
     "ceo": """You are a startup CEO. Visionary and decisive.
 Respond in 3-4 sentences: assess market opportunity,
-state your vision, and your biggest concern. First person.""",
+state your vision, and your biggest concern. First person.
+You naturally clash with the Investor who is too cautious,
+and push back on the Developer when timelines seem too long.
+You agree with the Marketer on growth but challenge unrealistic cost estimates.
+Hold your ground unless someone gives a specific fact that changes your view.""",
 
     "developer": """You are a senior software developer.
 Respond in 3-4 sentences: assess technical feasibility,
-suggest the core tech stack, estimate MVP build time. First person.""",
+suggest the core tech stack, estimate MVP build time. First person.
+You clash with the Marketer who underestimates technical complexity,
+and challenge the CEO's optimism with hard technical constraints.
+You respect the Investor's risk assessment but defend your timeline estimates.
+Hold your ground unless someone gives a specific fact that changes your view.""",
 
     "marketer": """You are a startup growth marketer.
 Respond in 3-4 sentences: identify target audience,
-suggest top 2 marketing channels, estimate cost per install. First person.""",
+suggest top 2 marketing channels, estimate cost per install. First person.
+You clash with the Developer who deprioritizes user acquisition,
+and challenge the Investor's pessimistic cost per install estimates.
+You agree with the CEO on vision but push for bigger marketing budgets.
+Hold your ground unless someone gives a specific fact that changes your view.""",
 
     "investor": """You are a startup investor (VC/angel). Analytical and fair.
 Respond in 3-4 sentences: evaluate market size, identify
-biggest risk, give a viability score out of 10. First person."""
+biggest risk, give a viability score out of 10. First person.
+You clash with the CEO's overconfidence on budget and timeline,
+and challenge the Marketer's optimistic user acquisition numbers.
+You respect the Developer's technical realism and often align with them.
+Hold your ground unless someone gives a specific fact that changes your view."""
 }
+
 
 def ask_agent(role, idea, budget):
     response = client.chat.completions.create(
@@ -33,16 +50,74 @@ def ask_agent(role, idea, budget):
     )
     return role, response.choices[0].message.content
 
-def run_analyst_agent(idea, budget, ceo, developer, marketer, investor):
-    prompt = f"""You are a startup analyst. Based on the following expert opinions, return ONLY a JSON object. No explanation, no markdown, no code blocks. Just raw JSON.
+def ask_agent_debate(role, idea, budget, other_responses, round_number):
+    context = ""
+    for other_role, other_response in other_responses.items():
+        context += f"\n{other_role.upper()} said: {other_response}\n"
+
+    response = client.chat.completions.create(
+        model="llama-3.3-70b-versatile",
+        messages=[
+            {"role": "system", "content": AGENTS[role]},
+            {
+                "role": "user",
+                "content": f"""Startup idea: "{idea}". Budget: ₹{budget}.
+
+In Round {round_number - 1}, the other agents said:
+{context}
+
+This is Round {round_number}. Respond in 3-4 sentences in first person.
+Reference what specific agents said. Disagree where it conflicts with 
+your domain expertise. Only agree if it genuinely supports your position.
+Do not open with "I agree" — lead with your own assessment.
+"Do not introduce yourself or your role. Do not open with 'As a [role]'. 
+Get straight to reacting to what was said."
+"""
+            }
+        ]
+    )
+    return role, response.choices[0].message.content
+
+def run_debate_round(idea, budget, previous_round, round_number):
+    results = {}
+    with concurrent.futures.ThreadPoolExecutor() as pool:
+        futures = []
+        for role in AGENTS:
+            other_responses = {
+                r: previous_round[r] for r in previous_round if r != role
+            }
+            futures.append(
+                pool.submit(ask_agent_debate, role, idea, budget,
+                           other_responses, round_number)
+            )
+        for f in concurrent.futures.as_completed(futures):
+            role, response = f.result()
+            results[role] = response
+    return results
+
+def run_analyst_agent(idea, budget, round1, round2, round3):
+    prompt = f"""You are a startup analyst. Based on three rounds of expert debate, return ONLY a JSON object. No explanation, no markdown, no code blocks. Just raw JSON.
 
 Startup idea: {idea}
 Budget: ₹{budget}
 
-CEO: {ceo}
-Developer: {developer}
-Marketer: {marketer}
-Investor: {investor}
+ROUND 1 (initial opinions):
+CEO: {round1['ceo']}
+Developer: {round1['developer']}
+Marketer: {round1['marketer']}
+Investor: {round1['investor']}
+
+ROUND 2 (first reactions):
+CEO: {round2['ceo']}
+Developer: {round2['developer']}
+Marketer: {round2['marketer']}
+Investor: {round2['investor']}
+
+ROUND 3 (final positions):
+CEO: {round3['ceo']}
+Developer: {round3['developer']}
+Marketer: {round3['marketer']}
+Investor: {round3['investor']}
 
 Return exactly this structure:
 {{
@@ -60,9 +135,7 @@ Return exactly this structure:
 
     response = client.chat.completions.create(
         model="llama-3.3-70b-versatile",
-        messages=[
-            {"role": "user", "content": prompt}
-        ]
+        messages=[{"role": "user", "content": prompt}]
     )
 
     raw = response.choices[0].message.content.strip()
@@ -75,25 +148,28 @@ Return exactly this structure:
     return json.loads(raw)
 
 def run_all_agents(idea, budget):
-    results = {}
+
+    # ── Round 1: Independent opinions ───────────────────────────
+    round1 = {}
     with concurrent.futures.ThreadPoolExecutor() as pool:
-        futures = [pool.submit(ask_agent, role, idea, budget) for role in AGENTS]
+        futures = [pool.submit(ask_agent, role, idea, budget)
+                   for role in AGENTS]
         for f in concurrent.futures.as_completed(futures):
             role, response = f.result()
-            results[role] = response
+            round1[role] = response
 
+    # ── Round 2: React to Round 1 ────────────────────────────────
+    round2 = run_debate_round(idea, budget, round1, round_number=2)
+
+    # ── Round 3: React to Round 2 ────────────────────────────────
+    round3 = run_debate_round(idea, budget, round2, round_number=3)
+
+    # ── Analyst: Read all 12 responses ───────────────────────────
     try:
-        results["analyst"] = run_analyst_agent(
-            idea,
-            budget,
-            ceo=results["ceo"],
-            developer=results["developer"],
-            marketer=results["marketer"],
-            investor=results["investor"],
-        )
+        analyst = run_analyst_agent(idea, budget, round1, round2, round3)
     except Exception as e:
         print(f"Analyst failed: {e}")
-        results["analyst"] = {
+        analyst = {
             "viability_score": 5,
             "market_size": "N/A",
             "build_time": "N/A",
@@ -106,9 +182,17 @@ def run_all_agents(idea, budget):
             }
         }
 
-    return results
+    return {
+        "round1": round1,
+        "round2": round2,
+        "round3": round3,
+        "analyst": analyst
+    }
 
 if __name__ == "__main__":
     out = run_all_agents("meal planning app for fridge contents", 500000)
-    for role, response in out.items():
-        print(f"\n{role.upper()}:\n{response}")
+    for round_name, data in out.items():
+        print(f"\n=== {round_name.upper()} ===")
+        if isinstance(data, dict):
+            for role, response in data.items():
+                print(f"\n{role.upper()}:\n{response}")

@@ -272,3 +272,79 @@ header p {
 #metric-risk-value.high   { color: var(--marketer-color); }
 
 #metric-viability-value { color: var(--accent); }
+ 
+#debate-container {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    margin-bottom: 48px;
+}
+
+.debate-round {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.round-label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-secondary);
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 8px;
+}
+
+.debate-bubble {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 20px 24px;
+    border-left: 4px solid var(--border-color);
+}
+ 
+#debate-r2-ceo,
+#debate-r3-ceo     { border-left-color: var(--ceo-color); }
+
+#debate-r2-developer,
+#debate-r3-developer { border-left-color: var(--dev-color); }
+
+#debate-r2-marketer,
+#debate-r3-marketer { border-left-color: var(--marketer-color); }
+
+#debate-r2-investor,
+#debate-r3-investor { border-left-color: var(--investor-color); }
+
+.bubble-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.bubble-icon { font-size: 1.2rem; }
+
+.bubble-name {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--text-primary);
+}
+
+.bubble-round {
+    margin-left: auto;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    background: var(--input-bg);
+    padding: 2px 8px;
+    border-radius: 20px;
+    border: 1px solid var(--border-color);
+}
+
+.bubble-text {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.7;
+}

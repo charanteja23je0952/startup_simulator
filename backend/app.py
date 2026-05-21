@@ -15,7 +15,7 @@ def simulate():
         return jsonify({"error": "Please provide a startup idea"}), 400
 
     results = run_all_agents(idea, budget)
-    return jsonify({"success": True, "agents": results})
+    return jsonify({"success": True, **results})
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
