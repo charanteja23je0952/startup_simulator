@@ -12,19 +12,20 @@
 
     <div id="app">
         <header>
-            <h1>🚀 AI Startup Simulator</h1>
-            <p>Enter your startup idea and let 4 AI agents debate its future</p>
+            <h1>AI Startup Simulator</h1>
+            <p>Enter your startup idea to simulate a strategic debate between four AI personas.</p>
         </header>
+        
         <div id="input-section">
             <div id="input-card">
 
-                <label for="idea-input">💡 Your Startup Idea</label>
+                <label for="idea-input">Startup Idea</label>
                 <textarea
                     id="idea-input"
-                    placeholder="e.g. An AI-powered app that helps students find internships"
+                    placeholder="e.g., A platform matching university students with remote internships based on skill assessments."
                     rows="4"></textarea>
 
-                <label for="budget-slider">💰 Budget: ₹<span id="budget-display">5,00,000</span></label>
+                <label for="budget-slider">Available Budget: ₹<span id="budget-display">5,00,000</span></label>
                 <input
                     type="range"
                     id="budget-slider"
@@ -34,17 +35,18 @@
                     value="500000"
                 >
 
-                <button id="simulate-btn">⚡ Simulate My Startup</button>
+                <button id="simulate-btn">Run Simulation</button>
 
             </div>
         </div>
+        
         <div id="results-section">
 
             <div id="idea-summary">
                 Simulating: <span id="idea-summary-text"></span>
             </div>
 
-            <h2>📈 Startup Metrics</h2>
+            <h2>Startup Metrics</h2>
             <div id="metrics-container">
 
                 <div class="metric-card" id="metric-viability">
@@ -69,13 +71,12 @@
                 </div>
 
             </div>
-            <h2>🤖 Agent Perspectives</h2>
-
+            
+            <h2>Agent Perspectives</h2>
             <div id="cards-container">
 
                 <div class="agent-card" id="card-ceo">
                     <div class="card-header">
-                        <span class="agent-icon">👔</span>
                         <span class="agent-name">CEO Agent</span>
                     </div>
                     <div class="card-body">
@@ -85,7 +86,6 @@
 
                 <div class="agent-card" id="card-developer">
                     <div class="card-header">
-                        <span class="agent-icon">💻</span>
                         <span class="agent-name">Developer Agent</span>
                     </div>
                     <div class="card-body">
@@ -95,7 +95,6 @@
 
                 <div class="agent-card" id="card-marketer">
                     <div class="card-header">
-                        <span class="agent-icon">📣</span>
                         <span class="agent-name">Marketer Agent</span>
                     </div>
                     <div class="card-body">
@@ -105,7 +104,6 @@
 
                 <div class="agent-card" id="card-investor">
                     <div class="card-header">
-                        <span class="agent-icon">💼</span>
                         <span class="agent-name">Investor Agent</span>
                     </div>
                     <div class="card-body">
@@ -115,7 +113,7 @@
 
             </div>
  
-            <h2>🗣️ Agent Debate</h2>
+            <h2>Simulation Debate</h2>
             <div id="debate-container">
 
                 <div class="debate-round" id="debate-round2">
@@ -123,7 +121,6 @@
 
                     <div class="debate-bubble" id="debate-r2-ceo">
                         <div class="bubble-header">
-                            <span class="bubble-icon">👔</span>
                             <span class="bubble-name">CEO</span>
                             <span class="bubble-round">R2</span>
                         </div>
@@ -132,7 +129,6 @@
 
                     <div class="debate-bubble" id="debate-r2-developer">
                         <div class="bubble-header">
-                            <span class="bubble-icon">💻</span>
                             <span class="bubble-name">Developer</span>
                             <span class="bubble-round">R2</span>
                         </div>
@@ -141,7 +137,6 @@
 
                     <div class="debate-bubble" id="debate-r2-marketer">
                         <div class="bubble-header">
-                            <span class="bubble-icon">📣</span>
                             <span class="bubble-name">Marketer</span>
                             <span class="bubble-round">R2</span>
                         </div>
@@ -150,7 +145,6 @@
 
                     <div class="debate-bubble" id="debate-r2-investor">
                         <div class="bubble-header">
-                            <span class="bubble-icon">💼</span>
                             <span class="bubble-name">Investor</span>
                             <span class="bubble-round">R2</span>
                         </div>
@@ -163,7 +157,6 @@
 
                     <div class="debate-bubble" id="debate-r3-ceo">
                         <div class="bubble-header">
-                            <span class="bubble-icon">👔</span>
                             <span class="bubble-name">CEO</span>
                             <span class="bubble-round">R3</span>
                         </div>
@@ -172,7 +165,6 @@
 
                     <div class="debate-bubble" id="debate-r3-developer">
                         <div class="bubble-header">
-                            <span class="bubble-icon">💻</span>
                             <span class="bubble-name">Developer</span>
                             <span class="bubble-round">R3</span>
                         </div>
@@ -181,7 +173,6 @@
 
                     <div class="debate-bubble" id="debate-r3-marketer">
                         <div class="bubble-header">
-                            <span class="bubble-icon">📣</span>
                             <span class="bubble-name">Marketer</span>
                             <span class="bubble-round">R3</span>
                         </div>
@@ -190,8 +181,7 @@
 
                     <div class="debate-bubble" id="debate-r3-investor">
                         <div class="bubble-header">
-                            <span class="bubble-icon">💼</span>
-                            <span class="bubble-name">Investor</span>
+                            <span class="bubble-header">Investor</span>
                             <span class="bubble-round">R3</span>
                         </div>
                         <p class="bubble-text"></p>
@@ -200,7 +190,7 @@
 
             </div>
  
-            <h2>📊 Budget Allocation</h2>
+            <h2>Budget Allocation</h2>
             <div id="chart-container">
                 <canvas id="budget-chart"></canvas>
             </div>
