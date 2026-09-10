@@ -13,7 +13,7 @@ and your biggest concern. Be specific. Speak in first person."""
 def ask_agent(system_prompt, idea, budget):
     user_message = f'Startup idea: "{idea}". Budget: ₹{budget} lakhs.'
     response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
+        model="openai/gpt-oss-120b",
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_message}

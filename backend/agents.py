@@ -42,7 +42,7 @@ Hold your ground unless someone gives a specific fact that changes your view."""
 
 def ask_agent(role, idea, budget):
     response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
+        model="openai/gpt-oss-120b",
         messages=[
             {"role": "system", "content": AGENTS[role]},
             {"role": "user", "content": f'Startup idea: "{idea}". Budget: ₹{budget}.'}
@@ -56,7 +56,7 @@ def ask_agent_debate(role, idea, budget, other_responses, round_number):
         context += f"\n{other_role.upper()} said: {other_response}\n"
 
     response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
+        model="openai/gpt-oss-120b",
         messages=[
             {"role": "system", "content": AGENTS[role]},
             {
@@ -134,7 +134,7 @@ Return exactly this structure:
 }}"""
 
     response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
+        model="openai/gpt-oss-120b",
         messages=[{"role": "user", "content": prompt}]
     )
 
