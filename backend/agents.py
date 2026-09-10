@@ -1,5 +1,5 @@
 from groq import Groq
-import os, concurrent.futures, json
+import os, concurrent.futures, json, time, re
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -20,6 +20,40 @@ def _get_client():
             "folder with GROQ_API_KEY=your_key_here (see .env.example)."
         )
     return client
+
+
+def _chat_completion(**kwargs):
+    """Wrapper for Groq chat completion with rate limit retry logic.
+    Catches 429 errors, reads wait time from error message, and retries up to 5 times."""
+    max_retries = 5
+    retry_count = 0
+    
+    while retry_count < max_retries:
+        try:
+            return _get_client().chat.completions.create(**kwargs)
+        except Exception as e:
+            error_str = str(e)
+            if "429" in error_str or "rate limit" in error_str.lower():
+                match = re.search(r'try again in (\d+)(ms|s)', error_str.lower())
+                if match:
+                    wait_time = int(match.group(1))
+                    unit = match.group(2)
+                    if unit == 'ms':
+                        wait_time = wait_time / 1000
+                    print(f"Rate limit hit. Waiting {wait_time}s before retry {retry_count + 1}/{max_retries}")
+                    time.sleep(wait_time)
+                    retry_count += 1
+                    continue
+                else:
+                    wait_time = min(2 ** retry_count, 10)
+                    print(f"Rate limit hit. Using default backoff {wait_time}s before retry {retry_count + 1}/{max_retries}")
+                    time.sleep(wait_time)
+                    retry_count += 1
+                    continue
+            else:
+                raise e
+    
+    raise RuntimeError(f"Rate limit exceeded after {max_retries} retries")
 
 AGENTS = {
     "ceo": """You are a startup CEO. Visionary and decisive.
@@ -57,8 +91,9 @@ Hold your ground unless someone gives a specific fact that changes your view."""
 
 
 def ask_agent(role, idea, budget):
-    response = _get_client().chat.completions.create(
+    response = _chat_completion(
         model="openai/gpt-oss-120b",
+        max_tokens=220,
         messages=[
             {"role": "system", "content": AGENTS[role]},
             {"role": "user", "content": f'Startup idea: "{idea}". Budget: ₹{budget}.'}
@@ -71,8 +106,9 @@ def ask_agent_debate(role, idea, budget, other_responses, round_number):
     for other_role, other_response in other_responses.items():
         context += f"\n{other_role.upper()} said: {other_response}\n"
 
-    response = _get_client().chat.completions.create(
+    response = _chat_completion(
         model="openai/gpt-oss-120b",
+        max_tokens=220,
         messages=[
             {"role": "system", "content": AGENTS[role]},
             {
@@ -149,8 +185,9 @@ Return exactly this structure:
     }}
 }}"""
 
-    response = _get_client().chat.completions.create(
+    response = _chat_completion(
         model="openai/gpt-oss-120b",
+        max_tokens=350,
         messages=[{"role": "user", "content": prompt}]
     )
 
