@@ -92,8 +92,8 @@ Hold your ground unless someone gives a specific fact that changes your view."""
 
 def ask_agent(role, idea, budget):
     response = _chat_completion(
-        model="openai/gpt-oss-120b",
-        max_tokens=220,
+        model="llama-3.3-70b-versatile",
+        max_tokens=250,
         messages=[
             {"role": "system", "content": AGENTS[role]},
             {"role": "user", "content": f'Startup idea: "{idea}". Budget: ₹{budget}.'}
@@ -107,8 +107,8 @@ def ask_agent_debate(role, idea, budget, other_responses, round_number):
         context += f"\n{other_role.upper()} said: {other_response}\n"
 
     response = _chat_completion(
-        model="openai/gpt-oss-120b",
-        max_tokens=220,
+        model="llama-3.3-70b-versatile",
+        max_tokens=600,
         messages=[
             {"role": "system", "content": AGENTS[role]},
             {
@@ -186,8 +186,8 @@ Return exactly this structure:
 }}"""
 
     response = _chat_completion(
-        model="openai/gpt-oss-120b",
-        max_tokens=350,
+        model="llama-3.3-70b-versatile",
+        max_tokens=800,
         messages=[{"role": "user", "content": prompt}]
     )
 
