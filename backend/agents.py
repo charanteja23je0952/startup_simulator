@@ -3,7 +3,23 @@ import os, concurrent.futures, json
 from dotenv import load_dotenv
 
 load_dotenv()
-client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+client = None
+if GROQ_API_KEY:
+    client = Groq(api_key=GROQ_API_KEY)
+
+
+def _get_client():
+    """Lazily validate/create the Groq client so importing this module
+    (and starting Flask) never crashes just because the key is missing."""
+    global client
+    if client is None:
+        raise RuntimeError(
+            "GROQ_API_KEY is not set. Create a .env file in the backend/ "
+            "folder with GROQ_API_KEY=your_key_here (see .env.example)."
+        )
+    return client
 
 AGENTS = {
     "ceo": """You are a startup CEO. Visionary and decisive.
@@ -41,7 +57,7 @@ Hold your ground unless someone gives a specific fact that changes your view."""
 
 
 def ask_agent(role, idea, budget):
-    response = client.chat.completions.create(
+    response = _get_client().chat.completions.create(
         model="openai/gpt-oss-120b",
         messages=[
             {"role": "system", "content": AGENTS[role]},
@@ -55,7 +71,7 @@ def ask_agent_debate(role, idea, budget, other_responses, round_number):
     for other_role, other_response in other_responses.items():
         context += f"\n{other_role.upper()} said: {other_response}\n"
 
-    response = client.chat.completions.create(
+    response = _get_client().chat.completions.create(
         model="openai/gpt-oss-120b",
         messages=[
             {"role": "system", "content": AGENTS[role]},
@@ -133,7 +149,7 @@ Return exactly this structure:
     }}
 }}"""
 
-    response = client.chat.completions.create(
+    response = _get_client().chat.completions.create(
         model="openai/gpt-oss-120b",
         messages=[{"role": "user", "content": prompt}]
     )
